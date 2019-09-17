@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.2.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.0.0
+ * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -10,7 +10,8 @@
  * subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * copies or substantial portions of the Software. If you wish to use our Amazon
+ * FreeRTOS name, please do so in a fair use way that does not cause confusion.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
@@ -26,12 +27,7 @@
  */
 
 /******************************************************************************
- * This project provides two demo applications.  A simple blinky style project,
- * and a more comprehensive test and demo application.  The
- * mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting is used to select between the two.
- * The simply blinky demo is implemented and described in main_blinky.c.  The
- * more comprehensive test and demo application is implemented and described in
- * main_full.c.
+ * This project provide a demo application.
  *
  * This file implements the code that is not demo specific, including the
  * hardware setup and FreeRTOS hook functions.
@@ -58,35 +54,20 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* This project provides two demo applications.  A simple blinky style demo
-application, and a more comprehensive test and demo application.  The
-mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting is used to select between the two.
-
-If mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is 1 then the blinky demo will be built.
-The blinky demo is implemented and described in main_blinky.c.
-
-If mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is not 1 then the comprehensive test and
-demo application will be built.  The comprehensive test and demo application is
-implemented and described in main_full.c. */
-#define mainCREATE_SIMPLE_BLINKY_DEMO_ONLY	1
 
 /* This demo uses heap_5.c, and these constants define the sizes of the regions
 that make up the total heap.  heap_5 is only used for test and example purposes
 as this demo could easily create one large heap region instead of multiple
 smaller heap regions - in which case heap_4.c would be the more appropriate
 choice.  See http://www.freertos.org/a00111.html for an explanation. */
-#define mainREGION_1_SIZE	8201
+#define mainREGION_1_SIZE	7201
 #define mainREGION_2_SIZE	29905
-#define mainREGION_3_SIZE	7607
+#define mainREGION_3_SIZE	6407
 
 /*-----------------------------------------------------------*/
 
-/*
- * main_blinky() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 1.
- * main_full() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 0.
- */
-extern void main_blinky( void );
-extern void main_full( void );
+
+extern void main_app( void );
 
 /*
  * Only the comprehensive demo uses application hook (callback) functions.  See
@@ -145,23 +126,9 @@ int main( void )
 	See http://www.FreeRTOS.org/trace for more information. */
 	vTraceEnable( TRC_START );
 
-	/* The mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting is described at the top
-	of this file. */
-	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
-	{
-		main_blinky();
-	}
-	#else
-	{
-		/* Start the trace recording - the recording is written to a file if
-		configASSERT() is called. */
-		printf( "\r\nTrace started.\r\nThe trace will be dumped to disk if a call to configASSERT() fails.\r\n" );
-		printf( "Uncomment the call to kbhit() in this file to also dump trace with a key press.\r\n" );
-		uiTraceStart();
 
-		main_full();
-	}
-	#endif
+	main_app();
+
 
 	return 0;
 }
@@ -212,13 +179,6 @@ void vApplicationIdleHook( void )
 		}
 	*/
 
-	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY != 1 )
-	{
-		/* Call the idle task processing used by the full demo.  The simple
-		blinky demo does not use the idle task hook. */
-		vFullDemoIdleFunction();
-	}
-	#endif
 }
 /*-----------------------------------------------------------*/
 
@@ -244,11 +204,6 @@ void vApplicationTickHook( void )
 	code must not attempt to block, and only the interrupt safe FreeRTOS API
 	functions can be used (those that end in FromISR()). */
 
-	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY != 1 )
-	{
-		vFullDemoTickHookFunction();
-	}
-	#endif /* mainCREATE_SIMPLE_BLINKY_DEMO_ONLY */
 }
 /*-----------------------------------------------------------*/
 
